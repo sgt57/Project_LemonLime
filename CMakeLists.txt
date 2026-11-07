@@ -54,13 +54,13 @@ if(NOT Qt_DIR AND DEFINED Qt${LEMON_QT_MAJOR_VERSION}_DIR)
     set(Qt_DIR ${Qt${LEMON_QT_MAJOR_VERSION}_DIR})
 endif()
 
-find_package(Qt${LEMON_QT_MAJOR_VERSION} ${LEMON_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Concurrent REQUIRED)
+find_package(Qt${LEMON_QT_MAJOR_VERSION} ${LEMON_QT_MIN_VERSION} COMPONENTS Core Gui Widgets Concurrent Network REQUIRED)
 
 set(LEMON_QT_LIBNAME Qt${LEMON_QT_MAJOR_VERSION})
 
 add_definitions(-DQT_NO_FOREACH)
 
-list(APPEND LEMON_QT_LIBS ${LEMON_QT_LIBNAME}::Core ${LEMON_QT_LIBNAME}::Gui ${LEMON_QT_LIBNAME}::Widgets ${LEMON_QT_LIBNAME}::Concurrent)
+list(APPEND LEMON_QT_LIBS ${LEMON_QT_LIBNAME}::Core ${LEMON_QT_LIBNAME}::Gui ${LEMON_QT_LIBNAME}::Widgets ${LEMON_QT_LIBNAME}::Concurrent ${LEMON_QT_LIBNAME}::Network)
 
 set(SINGLEAPPLICATION_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SingleApplication)
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
@@ -247,8 +247,11 @@ set_target_properties(lupdate PROPERTIES EXCLUDE_FROM_ALL TRUE)
 # Lemon Build
 # ==================================================================================
 
+include(cmake/lemon-updater.cmake)
+
 set(QRC_RESOURCES
     resource.qrc
+    ${LEMON_UPDATER_QRC}
     ${LEMON_EMBED_DOC_QRC}
     )
 
@@ -282,6 +285,7 @@ else()
     add_executable(lemon ${GUI_TYPE} ${LEMON_FULL_SOURCES})
     add_dependencies(lemon watcher_unix)
 endif()
+add_dependencies(lemon lemon-updater)
 
 target_include_directories(lemon PUBLIC ${CMAKE_SOURCE_DIR}/src)
 

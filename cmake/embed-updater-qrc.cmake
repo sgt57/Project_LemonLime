@@ -1,0 +1,5 @@
+if(NOT DEFINED OUTPUT OR NOT DEFINED INPUT)
+    message(FATAL_ERROR "OUTPUT and INPUT are required")
+endif()
+file(TO_CMAKE_PATH "${INPUT}" input_path)
+file(WRITE "${OUTPUT}" "<RCC>\n  <qresource prefix=\"/update\">\n    <file alias=\"updater\">${input_path}</file>\n  </qresource>\n</RCC>\n")
