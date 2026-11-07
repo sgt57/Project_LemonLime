@@ -117,7 +117,7 @@ auto CaseJudger::getNeedRejudge() const -> bool { return needRejudge; }
 class BufferedStreamReader {
 
   public:
-	static const int BUFFER_SIZE = 1 << 18; // 128 KiB
+	static const int BUFFER_SIZE = 1 << 16; // Two readers must fit on macOS worker-thread stacks.
 	explicit BufferedStreamReader(const char *filename) : file(fopen(filename, "r")) {
 		result.reserve(32);
 		// Start with bufPos == bufEnd so the first peekChar() triggers an

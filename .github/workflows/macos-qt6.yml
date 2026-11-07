@@ -61,51 +61,6 @@ jobs:
           QTEST_DISABLE_STACK_DUMP: "1"
         run: |
           ctest --test-dir . --output-on-failure --timeout 120
-      - name: Diagnose failed POSIX tests with LLDB
-        if: ${{ failure() && steps.tests.outcome == 'failure' }}
-        timeout-minutes: 6
-        env:
-          DIAGNOSTIC_ARCH: ${{ matrix.arch }}
-        run: |
-          mkdir -p diagnostics
-          python3 - <<'PY'
-          import os
-          from pathlib import Path
-          import signal
-          import subprocess
-
-          cases = [
-              ("integrated-test", "integrated-test", "judgeAll"),
-              ("judging-controller", "judging-controller-tests", "answersOnlyRepeatedBatches"),
-          ]
-          for directory, executable, function in cases:
-              binary = Path("tests", directory, executable).resolve()
-              command = [
-                  "/usr/bin/arch", "-" + os.environ["DIAGNOSTIC_ARCH"], "/usr/bin/lldb", "--batch",
-                  "-o", "settings set target.env-vars QTEST_DISABLE_STACK_DUMP=1",
-                  "-o", "run",
-                  "-k", "thread backtrace all",
-                  "-k", "register read",
-                  "-k", "process kill",
-                  "--", str(binary), function, "-nocrashhandler",
-              ]
-              log = Path("diagnostics", directory + "-lldb.txt")
-              with log.open("w") as output:
-                  process = subprocess.Popen(
-                      command, cwd=binary.parent, stdout=output,
-                      stderr=subprocess.STDOUT, start_new_session=True,
-                  )
-                  try:
-                      process.wait(timeout=90)
-                  except subprocess.TimeoutExpired:
-                      os.killpg(process.pid, signal.SIGKILL)
-                      process.wait()
-                      output.write("\nLLDB diagnostic exceeded 90 seconds.\n")
-                  output.write(f"\nLLDB exit code: {process.returncode}\n")
-              print(f"::group::{directory} LLDB diagnostics", flush=True)
-              print(log.read_text(), flush=True)
-              print("::endgroup::", flush=True)
-          PY
       - name: Collect macOS crash reports
         if: ${{ failure() && steps.tests.outcome == 'failure' }}
         run: |
