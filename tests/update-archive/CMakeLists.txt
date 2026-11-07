@@ -1,0 +1,10 @@
+add_executable(update-archive-test main.cpp ../../src/updater/archivezip.cpp)
+target_include_directories(update-archive-test PRIVATE ../../src/updater)
+target_link_libraries(update-archive-test PRIVATE lemon-miniz)
+target_compile_features(update-archive-test PRIVATE cxx_std_23)
+if(MSVC)
+    set_property(TARGET update-archive-test PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+add_test(NAME update-archive COMMAND update-archive-test)
+set_tests_properties(update-archive PROPERTIES TIMEOUT 30)
