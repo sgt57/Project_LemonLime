@@ -40,6 +40,7 @@
         <file alias="paint-unknown.llsvg">assets/pics/paint-unknown.svg</file>
         <file alias="quickopen-file.llsvg">assets/pics/quickopen-file.svg</file>
         <file alias="system-help.llsvg">assets/pics/system-help.svg</file>
+        <file alias="update.llsvg">assets/pics/update.svg</file>
         <file alias="acrobat.llsvg">assets/pics/acrobat.svg</file>
     </qresource>
 </RCC>

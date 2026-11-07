@@ -586,6 +586,10 @@
    </property>
   </action>
   <action name="checkUpdatesAction">
+   <property name="icon">
+    <iconset resource="../../resource.qrc">
+     <normaloff>:/icon/update.llsvg</normaloff>:/icon/update.llsvg</iconset>
+   </property>
    <property name="text">
     <string>Check for Updates</string>
    </property>
