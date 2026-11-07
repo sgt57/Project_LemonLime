@@ -28,6 +28,12 @@ ProcessRunnerResult UnixProcessRunner::run() {
 	ProcessRunnerResult res;
 	res.result = CorrectAnswer;
 	int extraTime = qCeil(qMax(2000, config.timeLimit * 2) * config.extraTimeRatio);
+	const auto childError = [&] {
+		QFile file(config.workingDirectory + "_tmperr");
+		if (! file.open(QIODevice::ReadOnly) || ! file.seek(qMax<qint64>(0, file.size() - 1024)))
+			return QString{};
+		return QString::fromLocal8Bit(file.read(1024));
+	};
 
 #ifdef Q_OS_LINUX
 	// TODO: rewrite with cgroup
@@ -214,6 +220,7 @@ ProcessRunnerResult UnixProcessRunner::run() {
 		                  .arg(runner.exitCode())
 		                  .arg(int(runner.error()))
 		                  .arg(runner.errorString(), QString::fromLocal8Bit(runner.readAllStandardError()));
+		res.message += '\n' + childError();
 		WARN(config.executableFile, res.message);
 		return res;
 	}
@@ -272,6 +279,7 @@ ProcessRunnerResult UnixProcessRunner::run() {
 		                  .arg(code)
 		                  .arg(int(runner.error()))
 		                  .arg(runner.errorString(), res.message);
+		res.message += '\n' + childError();
 		WARN(config.executableFile, res.message);
 	}
 

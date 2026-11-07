@@ -62,6 +62,8 @@ jobs:
       - name: Diagnose failed POSIX tests with LLDB
         if: ${{ failure() && steps.tests.outcome == 'failure' }}
         timeout-minutes: 6
+        env:
+          DIAGNOSTIC_ARCH: ${{ matrix.arch }}
         run: |
           mkdir -p diagnostics
           python3 - <<'PY'
@@ -77,7 +79,7 @@ jobs:
           for directory, executable, function in cases:
               binary = Path("tests", directory, executable).resolve()
               command = [
-                  "lldb", "--batch",
+                  "/usr/bin/arch", "-" + os.environ["DIAGNOSTIC_ARCH"], "/usr/bin/lldb", "--batch",
                   "-o", "settings set target.env-vars QTEST_DISABLE_STACK_DUMP=1",
                   "-o", "run",
                   "-k", "thread backtrace all",
@@ -102,6 +104,20 @@ jobs:
               print(log.read_text(), flush=True)
               print("::endgroup::", flush=True)
           PY
+      - name: Collect macOS crash reports
+        if: ${{ failure() && steps.tests.outcome == 'failure' }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+
+          destination = Path("diagnostics")
+          destination.mkdir(exist_ok=True)
+          for directory in [Path.home() / "Library/Logs/DiagnosticReports", Path("/Library/Logs/DiagnosticReports")]:
+              for report in directory.glob("*"):
+                  if report.is_file() and report.name.startswith(("integrated-test", "judging-controller")):
+                      shutil.copy2(report, destination / report.name)
+          PY
       - name: Upload failed test diagnostics
         if: ${{ failure() && steps.tests.outcome == 'failure' }}
         uses: actions/upload-artifact@v7
@@ -109,7 +125,7 @@ jobs:
           name: posix-tests-macos-${{ matrix.arch }}-${{ matrix.build_type }}
           path: |
             Testing/Temporary/LastTest.log
-            diagnostics/*.txt
+            diagnostics/
       # tag 打包
       - name: package
         env:

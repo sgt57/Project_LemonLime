@@ -86,8 +86,21 @@ jobs:
           cmake ../Project_LemonLime -GNinja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DLEMON_BUILD_INFO="Build for Linux" -DLEMON_BUILD_EXTRA_INFO="Build on $(uname -sr)" -DCMAKE_PREFIX_PATH=../qt6/bin
           cmake --build . --parallel $(nproc)
       - name: Run tests
+        id: tests
         run: |
           ctest --test-dir ../build --output-on-failure --timeout 120
+      - name: Diagnose memory testcase without core dumps
+        if: ${{ failure() && steps.tests.outcome == 'failure' }}
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          echo 'Original core dump limit:'
+          ulimit -c
+          echo 'Kernel core dump handler:'
+          cat /proc/sys/kernel/core_pattern
+          ulimit -c 0
+          cd ../build/tests/integrated-test
+          ./integrated-test judgeAll
       - name: Package
         run: |
           cd ../build
