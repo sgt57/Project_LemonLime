@@ -85,7 +85,7 @@ namespace Lemon::Update {
 		}
 
 		class LinuxParent final : public ParentProcess {
-		public:
+		  public:
 			LinuxParent(pid_t pid, const fs::path &executable)
 			    : pid(pid), identity(processIdentity(pid)), descriptor(openProcessDescriptor(pid)) {
 				if (! identity || identity->zombie)
@@ -113,12 +113,12 @@ namespace Lemon::Update {
 				return (event.revents & POLLIN) != 0;
 			}
 
-		private:
+		  private:
 			pid_t pid;
 			std::optional<ProcessIdentity> identity;
 			FileDescriptor descriptor;
 		};
-	}
+	} // namespace
 
 	std::unique_ptr<ParentProcess> acquireParent(unsigned long pid, const fs::path &executable) {
 		if (pid > static_cast<unsigned long>(std::numeric_limits<pid_t>::max()))
@@ -126,6 +126,6 @@ namespace Lemon::Update {
 		return std::make_unique<LinuxParent>(static_cast<pid_t>(pid), executable);
 	}
 
-}
+} // namespace Lemon::Update
 
 #endif

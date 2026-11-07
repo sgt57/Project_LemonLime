@@ -50,9 +50,7 @@ namespace Lemon::Update {
 					fail("cannot read archive directory");
 			}
 
-			~Reader() {
-				mz_zip_reader_end(&archive);
-			}
+			~Reader() { mz_zip_reader_end(&archive); }
 
 			Reader(const Reader &) = delete;
 			Reader &operator=(const Reader &) = delete;
@@ -120,7 +118,8 @@ namespace Lemon::Update {
 		}
 
 		bool asciiEqual(std::string_view left, std::string_view right) {
-			return std::ranges::equal(left, right, [](char a, char b) { return asciiUpper(a) == asciiUpper(b); });
+			return std::ranges::equal(left, right,
+			                          [](char a, char b) { return asciiUpper(a) == asciiUpper(b); });
 		}
 
 		bool reservedDevice(std::string_view component) {
@@ -129,7 +128,8 @@ namespace Lemon::Update {
 			while (! stem.empty() && stem.back() == ' ')
 				stem.remove_suffix(1);
 			constexpr std::array devices{"CON", "PRN", "AUX", "NUL", "CLOCK$", "CONIN$", "CONOUT$"};
-			if (std::ranges::any_of(devices, [stem](std::string_view device) { return asciiEqual(stem, device); }))
+			if (std::ranges::any_of(devices,
+			                        [stem](std::string_view device) { return asciiEqual(stem, device); }))
 				return true;
 			const auto prefix = stem.substr(0, 3);
 			if (! (asciiEqual(prefix, "COM") || asciiEqual(prefix, "LPT")))
@@ -251,9 +251,9 @@ namespace Lemon::Update {
 				return CompareStringOrdinal(a.data(), static_cast<int>(a.size()), b.data(),
 				                            static_cast<int>(b.size()), TRUE) == CSTR_LESS_THAN;
 #else
-				return std::lexicographical_compare(left.native().begin(), left.native().end(),
-				                                    right.native().begin(), right.native().end(),
-				                                    [](char a, char b) { return asciiUpper(a) < asciiUpper(b); });
+				return std::lexicographical_compare(
+				    left.native().begin(), left.native().end(), right.native().begin(), right.native().end(),
+				    [](char a, char b) { return asciiUpper(a) < asciiUpper(b); });
 #endif
 			}
 		};
@@ -332,7 +332,8 @@ namespace Lemon::Update {
 				const bool directory = name.ends_with('/');
 				validateAttributes(stat, directory);
 				validateLocalHeader(archive, stat, name);
-				entries.push_back({index, registerPath(nodes, name, directory, root), directory, stat.m_uncomp_size});
+				entries.push_back(
+				    {index, registerPath(nodes, name, directory, root), directory, stat.m_uncomp_size});
 			}
 			if (entries.empty())
 				fail("empty archive");
@@ -404,7 +405,8 @@ namespace Lemon::Update {
 					return 0;
 				size_t done = 0;
 				while (done < size) {
-					const auto count = output.writeChunk(static_cast<const char *>(buffer) + done, size - done);
+					const auto count =
+					    output.writeChunk(static_cast<const char *>(buffer) + done, size - done);
 					if (count == 0)
 						return done;
 					done += count;
@@ -455,7 +457,8 @@ namespace Lemon::Update {
 			}
 		};
 
-		void extractEntries(mz_zip_archive &archive, const std::vector<Entry> &entries, const fs::path &payload) {
+		void extractEntries(mz_zip_archive &archive, const std::vector<Entry> &entries,
+		                    const fs::path &payload) {
 			for (const auto &entry : entries) {
 				if (entry.directory) {
 					makeDirectories(payload, entry.relative);

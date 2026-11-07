@@ -72,7 +72,7 @@ namespace {
 			return {};
 		QString directory = info.canonicalFilePath();
 		if (QFileInfo(directory).absolutePath().compare(QFileInfo(QDir::tempPath()).canonicalFilePath(),
-		                                               Qt::CaseInsensitive) != 0)
+		                                                Qt::CaseInsensitive) != 0)
 			return {};
 		return directory;
 	}
@@ -82,8 +82,8 @@ namespace {
 		DWORD length = static_cast<DWORD>(std::size(path));
 		if (! QueryFullProcessImageNameW(process, 0, path, &length))
 			return false;
-		const QString executable = QFileInfo(QString::fromWCharArray(path, static_cast<qsizetype>(length)))
-		                               .canonicalFilePath();
+		const QString executable =
+		    QFileInfo(QString::fromWCharArray(path, static_cast<qsizetype>(length))).canonicalFilePath();
 		return executable.compare(QDir(directory).filePath("lemon-updater.exe"), Qt::CaseInsensitive) == 0;
 	}
 
@@ -162,14 +162,15 @@ void UpdateInstaller::prepare(const QString &packagePath, const QString &workDir
 	helper = QDir(directory).filePath("lemon-updater");
 #endif
 	if (! QFile::copy(":/update/updater", helper) ||
-	    ! QFile::setPermissions(helper, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner)) {
+	    ! QFile::setPermissions(helper,
+	                            QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner)) {
 		emit failed(tr("Cannot create the independent update helper."));
 		return;
 	}
 	preparing = true;
 	process->setProgram(helper);
-	process->setArguments({"prepare", directory, QFileInfo(packagePath).absoluteFilePath(), installationDirectory,
-	                       executable});
+	process->setArguments(
+	    {"prepare", directory, QFileInfo(packagePath).absoluteFilePath(), installationDirectory, executable});
 	timeout->start(300000);
 	process->start();
 }

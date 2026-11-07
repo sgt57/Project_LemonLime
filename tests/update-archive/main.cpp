@@ -233,9 +233,12 @@ namespace {
 		for (size_t index = 0; index < large.size(); ++index)
 			large[index] = static_cast<char>(index % 251);
 		const auto destination = test.payload();
-		test.extract(archive({directory("release/"), {"release/lemon.exe", large},
-		                      {"release/Qt6Core.dll", "runtime"}, directory("release/plugins/"),
-		                      {"release/plugins/\xe4\xb8\xad\xe6\x96\x87.txt", "unicode"}}), destination);
+		test.extract(archive({directory("release/"),
+		                      {"release/lemon.exe", large},
+		                      {"release/Qt6Core.dll", "runtime"},
+		                      directory("release/plugins/"),
+		                      {"release/plugins/\xe4\xb8\xad\xe6\x96\x87.txt", "unicode"}}),
+		             destination);
 		require(load(destination / "lemon.exe") == large, "stored stream data changed");
 		require(load(destination / "Qt6Core.dll") == "runtime", "runtime was not extracted");
 		require(load(destination / fs::path(u8"plugins/中文.txt")) == "unicode", "Unicode path changed");
@@ -288,16 +291,43 @@ namespace {
 	}
 
 	void badNames(Directory &test) {
-		const std::vector<std::string> names{
-		    "../outside.txt", "release/../outside.txt", "release/a/../../outside.txt", "/release/outside.txt",
-		    "C:/outside.txt", "release/C:outside.txt", "release/a:stream", "release/\\outside.txt",
-		    "release/a\\..\\outside.txt", "release//outside.txt", "release/./outside.txt", "release/name.",
-		    "release/name ", "release/CON", "release/aux.txt", "release/NUL.txt", "release/COM1.log",
-		    "release/CON .txt", "release/COM1 .log", "release/AUX .txt",
-		    "release/LPT9", "release/COM\xc2\xb9.txt", "release/CONIN$", "release/a?b", "release/a*b",
-		    "release/a\"b", "release/a<b", "release/a>b", "release/a|b", "release/\x01", "release/\xc0\xaf",
-		    "release/\xed\xa0\x80", "release/\xf4\x90\x80\x80", "release/\xe4\xb8", "lemon.exe",
-		    "release/" + std::string(256, 'a'), std::string("release/a\0b", 11)};
+		const std::vector<std::string> names{"../outside.txt",
+		                                     "release/../outside.txt",
+		                                     "release/a/../../outside.txt",
+		                                     "/release/outside.txt",
+		                                     "C:/outside.txt",
+		                                     "release/C:outside.txt",
+		                                     "release/a:stream",
+		                                     "release/\\outside.txt",
+		                                     "release/a\\..\\outside.txt",
+		                                     "release//outside.txt",
+		                                     "release/./outside.txt",
+		                                     "release/name.",
+		                                     "release/name ",
+		                                     "release/CON",
+		                                     "release/aux.txt",
+		                                     "release/NUL.txt",
+		                                     "release/COM1.log",
+		                                     "release/CON .txt",
+		                                     "release/COM1 .log",
+		                                     "release/AUX .txt",
+		                                     "release/LPT9",
+		                                     "release/COM\xc2\xb9.txt",
+		                                     "release/CONIN$",
+		                                     "release/a?b",
+		                                     "release/a*b",
+		                                     "release/a\"b",
+		                                     "release/a<b",
+		                                     "release/a>b",
+		                                     "release/a|b",
+		                                     "release/\x01",
+		                                     "release/\xc0\xaf",
+		                                     "release/\xed\xa0\x80",
+		                                     "release/\xf4\x90\x80\x80",
+		                                     "release/\xe4\xb8",
+		                                     "lemon.exe",
+		                                     "release/" + std::string(256, 'a'),
+		                                     std::string("release/a\0b", 11)};
 		for (const auto &name : names)
 			test.rejects({{name}});
 		test.rejects({directory("release//")});

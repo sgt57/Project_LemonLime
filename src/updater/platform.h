@@ -12,7 +12,7 @@
 namespace Lemon::Update {
 
 	class ParentProcess {
-	public:
+	  public:
 		virtual ~ParentProcess() = default;
 		virtual bool exited() = 0;
 	};
@@ -29,4 +29,4 @@ namespace Lemon::Update {
 	std::string nativeError(unsigned long code);
 	unsigned long currentPid() noexcept;
 
-}
+} // namespace Lemon::Update

@@ -4,12 +4,12 @@
  */
 #ifdef __APPLE__
 
-#include "platform.h"
 #include "filesystem.h"
+#include "platform.h"
 #include "posix.h"
 
-#include <limits>
 #include <libproc.h>
+#include <limits>
 #include <optional>
 #include <sys/event.h>
 #include <sys/sysctl.h>
@@ -34,7 +34,7 @@ namespace Lemon::Update {
 		}
 
 		class MacParent final : public ParentProcess {
-		public:
+		  public:
 			MacParent(pid_t pid, const fs::path &executable) : queue(kqueue()) {
 				if (queue.get() < 0)
 					posixFailure("Cannot acquire a parent process event queue", {});
@@ -65,11 +65,12 @@ namespace Lemon::Update {
 				if (result < 0)
 					posixFailure("Cannot wait for the parent process", {});
 				if (result != 0 && (event.flags & EV_ERROR) != 0)
-					fail("Parent process event failed: " + nativeError(static_cast<unsigned long>(event.data)));
+					fail("Parent process event failed: " +
+					     nativeError(static_cast<unsigned long>(event.data)));
 				return result != 0 && (event.fflags & NOTE_EXIT) != 0;
 			}
 
-		private:
+		  private:
 			FileDescriptor queue;
 		};
 
@@ -92,7 +93,7 @@ namespace Lemon::Update {
 			runSystemUtility({"/usr/bin/hdiutil", "detach", pathText(mount)}, log);
 			fs::remove(mount);
 		}
-	}
+	} // namespace
 
 	std::unique_ptr<ParentProcess> acquireParent(unsigned long pid, const fs::path &executable) {
 		if (pid > static_cast<unsigned long>(std::numeric_limits<pid_t>::max()))
@@ -104,8 +105,9 @@ namespace Lemon::Update {
 		const auto mount = arguments.work / "mount";
 		const auto log = arguments.work / "disk-image.log";
 		createDirectory(mount);
-		runSystemUtility({"/usr/bin/hdiutil", "attach", "-readonly", "-nobrowse", "-noautoopen", "-mountpoint",
-		                  pathText(mount), pathText(arguments.package)}, log);
+		runSystemUtility({"/usr/bin/hdiutil", "attach", "-readonly", "-nobrowse", "-noautoopen",
+		                  "-mountpoint", pathText(mount), pathText(arguments.package)},
+		                 log);
 		try {
 			copyTree(findApplicationBundle(mount), payload);
 		} catch (const std::exception &error) {
@@ -120,6 +122,6 @@ namespace Lemon::Update {
 		detachImage(mount, log);
 	}
 
-}
+} // namespace Lemon::Update
 
 #endif

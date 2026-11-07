@@ -8,8 +8,8 @@
  */
 
 #include "lemon.h"
-#include "updateinstaller.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "updateinstaller.h"
 //
 #include "base/LemonBase.hpp"
 #include "base/LemonBaseApplication.hpp"

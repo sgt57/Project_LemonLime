@@ -25,4 +25,4 @@ namespace Lemon::Update {
 	[[noreturn]] void fail(const std::string &message);
 	void writeError(const fs::path &work, const std::string &message);
 
-}
+} // namespace Lemon::Update

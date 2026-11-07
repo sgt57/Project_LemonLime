@@ -114,8 +114,8 @@ namespace Lemon::Update {
 	fs::path makeTemporaryDirectory(const fs::path &parent) {
 		static std::atomic<unsigned long> counter{0};
 		const auto clock = std::chrono::steady_clock::now().time_since_epoch().count();
-		const auto name = ".lemon-update-" + std::to_string(currentPid()) + "-" + std::to_string(clock) + "-" +
-		                  std::to_string(counter.fetch_add(1, std::memory_order_relaxed));
+		const auto name = ".lemon-update-" + std::to_string(currentPid()) + "-" + std::to_string(clock) +
+		                  "-" + std::to_string(counter.fetch_add(1, std::memory_order_relaxed));
 		const auto path = parent / name;
 		createDirectory(path);
 		return path;
@@ -131,7 +131,8 @@ namespace Lemon::Update {
 		std::error_code error;
 		fs::remove_all(path, error);
 		if (error)
-			fail(original + "\nCannot remove temporary directory: " + pathText(path) + ": " + error.message());
+			fail(original + "\nCannot remove temporary directory: " + pathText(path) + ": " +
+			     error.message());
 	}
 
 	void replaceLeaf(const fs::path &source, const fs::path &destination) {
@@ -148,7 +149,8 @@ namespace Lemon::Update {
 	}
 
 	Transaction::Transaction(const Arguments &arguments)
-	    : arguments(arguments), payload(arguments.work / "payload"), backupDirectory(arguments.work / "backup") {}
+	    : arguments(arguments), payload(arguments.work / "payload"),
+	      backupDirectory(arguments.work / "backup") {}
 
 	void Transaction::inspectDirectory(const fs::path &relative) {
 		const auto target = arguments.installation / relative;
@@ -223,7 +225,8 @@ namespace Lemon::Update {
 		}
 		for (auto directory = directories.rbegin(); directory != directories.rend(); ++directory) {
 			if (directory->created)
-				copyDirectoryMetadata(payload / directory->relative, arguments.installation / directory->relative);
+				copyDirectoryMetadata(payload / directory->relative,
+				                      arguments.installation / directory->relative);
 		}
 	}
 
@@ -266,4 +269,4 @@ namespace Lemon::Update {
 		return errors;
 	}
 
-}
+} // namespace Lemon::Update

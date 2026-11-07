@@ -2,21 +2,22 @@
  * SPDX-FileCopyrightText: 2026 Project LemonLime
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
-#include "updater.h"
 #include "platform.h"
+#include "updater.h"
 
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
 #include <shellapi.h>
+#include <windows.h>
 
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
 	int count = 0;
 	wchar_t **arguments = CommandLineToArgvW(GetCommandLineW(), &count);
 	if (! arguments) {
-		Lemon::Update::showError("Cannot read updater arguments: " + Lemon::Update::nativeError(GetLastError()));
+		Lemon::Update::showError("Cannot read updater arguments: " +
+		                         Lemon::Update::nativeError(GetLastError()));
 		return 1;
 	}
 	std::vector<std::filesystem::path> paths;

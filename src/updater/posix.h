@@ -15,7 +15,7 @@
 namespace Lemon::Update {
 
 	class FileDescriptor {
-	public:
+	  public:
 		explicit FileDescriptor(int descriptor) : value(descriptor) {
 			// Keep dup2 sources away from stdin/stdout/stderr even when the launcher closed them.
 			if (value >= 0 && value < 3) {
@@ -36,17 +36,18 @@ namespace Lemon::Update {
 			}
 		}
 
-	private:
+	  private:
 		int value;
 	};
 
 	[[noreturn]] inline void posixFailure(std::string_view operation, const fs::path &path) {
 		const auto code = errno;
-		fail(std::string(operation) + ": " + pathText(path) + ": " + nativeError(static_cast<unsigned long>(code)));
+		fail(std::string(operation) + ": " + pathText(path) + ": " +
+		     nativeError(static_cast<unsigned long>(code)));
 	}
 
 	void runSystemUtility(const std::vector<std::string> &arguments, const fs::path &log);
 
-}
+} // namespace Lemon::Update
 
 #endif

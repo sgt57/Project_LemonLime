@@ -33,13 +33,13 @@ namespace Lemon::Update {
 	};
 
 	class Transaction {
-	public:
+	  public:
 		explicit Transaction(const Arguments &arguments);
 		void prepare();
 		void apply();
 		std::string rollback() noexcept;
 
-	private:
+	  private:
 		void collect();
 		void inspectDirectory(const fs::path &relative);
 		void inspectLeaf(const fs::path &relative);
@@ -54,4 +54,4 @@ namespace Lemon::Update {
 		std::vector<DirectoryChange> directories;
 	};
 
-}
+} // namespace Lemon::Update

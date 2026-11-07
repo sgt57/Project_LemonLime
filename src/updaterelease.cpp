@@ -30,7 +30,7 @@ namespace {
 		const QRegularExpression currentPattern(
 		    QString("^lemonlime-\\d+\\.\\d+\\.\\d+-%1-%2-release-qt6\\.\\d+\\.\\d+-[0-9a-f]+%3$")
 		        .arg(QRegularExpression::escape(packagePlatform), QRegularExpression::escape(packageArch),
-				     extension));
+		             extension));
 		if (currentPattern.match(name).hasMatch())
 			return true;
 		if (platform == "windows") {

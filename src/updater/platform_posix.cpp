@@ -4,8 +4,8 @@
  */
 #ifndef _WIN32
 
-#include "platform.h"
 #include "filesystem.h"
+#include "platform.h"
 #include "posix.h"
 
 #include <array>
@@ -34,21 +34,22 @@ namespace Lemon::Update {
 		std::fwrite(message.data(), 1, message.size(), stderr);
 		std::fputc('\n', stderr);
 #ifdef __APPLE__
-		const auto text = CFStringCreateWithBytes(kCFAllocatorDefault,
-		                                           reinterpret_cast<const UInt8 *>(message.data()),
-		                                           static_cast<CFIndex>(message.size()), kCFStringEncodingUTF8,
-		                                           false);
+		const auto text =
+		    CFStringCreateWithBytes(kCFAllocatorDefault, reinterpret_cast<const UInt8 *>(message.data()),
+		                            static_cast<CFIndex>(message.size()), kCFStringEncodingUTF8, false);
 		if (text) {
 			CFOptionFlags response = 0;
 			CFUserNotificationDisplayAlert(0, kCFUserNotificationStopAlertLevel, nullptr, nullptr, nullptr,
-			                               CFSTR("LemonLime update"), text, CFSTR("OK"), nullptr, nullptr, &response);
+			                               CFSTR("LemonLime update"), text, CFSTR("OK"), nullptr, nullptr,
+			                               &response);
 			CFRelease(text);
 		}
 #endif
 	}
 
 	void checkNativePath(const fs::path &path) {
-		// Native POSIX directory links are rejected by requireSafeParents. Leaf links are copied, never followed.
+		// Native POSIX directory links are rejected by requireSafeParents. Leaf links are copied, never
+		// followed.
 		struct stat status{};
 		if (lstat(path.c_str(), &status) != 0)
 			posixFailure("Cannot inspect update path", path);
@@ -82,8 +83,8 @@ namespace Lemon::Update {
 			posixFailure("Cannot read update file metadata", source);
 		if (! S_ISREG(status.st_mode))
 			fail("Update source is not a regular file: " + pathText(source));
-		const FileDescriptor output(open(destination.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW,
-		                                 S_IRUSR | S_IWUSR));
+		const FileDescriptor output(open(
+		    destination.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, S_IRUSR | S_IWUSR));
 		if (output.get() < 0)
 			posixFailure("Cannot create update file", destination);
 		std::array<char, 65536> buffer{};
@@ -174,7 +175,8 @@ namespace Lemon::Update {
 			close(configuration.errorRead);
 			if (configuration.detached && setsid() < 0)
 				reportChildFailure(configuration.errorWrite);
-			if (dup2(configuration.input, STDIN_FILENO) < 0 || dup2(configuration.output, STDOUT_FILENO) < 0 ||
+			if (dup2(configuration.input, STDIN_FILENO) < 0 ||
+			    dup2(configuration.output, STDOUT_FILENO) < 0 ||
 			    dup2(configuration.output, STDERR_FILENO) < 0)
 				reportChildFailure(configuration.errorWrite);
 			if (configuration.directory && chdir(configuration.directory) != 0)
@@ -219,8 +221,8 @@ namespace Lemon::Update {
 			requireSafeParents(log.parent_path());
 			if (present(log))
 				requireRegularFile(log);
-			const FileDescriptor output(open(log.c_str(), O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC | O_NOFOLLOW,
-			                                 S_IRUSR | S_IWUSR));
+			const FileDescriptor output(
+			    open(log.c_str(), O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC | O_NOFOLLOW, S_IRUSR | S_IWUSR));
 			const FileDescriptor input(open("/dev/null", O_RDONLY | O_CLOEXEC));
 			if (output.get() < 0 || input.get() < 0)
 				posixFailure("Cannot open process logging", log);
@@ -237,9 +239,11 @@ namespace Lemon::Update {
 			if (fcntl(errorRead.get(), F_SETFD, FD_CLOEXEC) < 0 ||
 			    fcntl(errorWrite.get(), F_SETFD, FD_CLOEXEC) < 0)
 				posixFailure("Cannot secure process handshake pipe", {});
-			const ChildConfiguration configuration{pointers.data(), directory.empty() ? nullptr : directory.c_str(),
-			                                       input.get(), output.get(), errorRead.get(), errorWrite.get(),
-			                                       detached};
+			const ChildConfiguration configuration{
+			    pointers.data(), directory.empty() ? nullptr : directory.c_str(),
+			    input.get(),     output.get(),
+			    errorRead.get(), errorWrite.get(),
+			    detached};
 			const auto pid = fork();
 			if (pid < 0)
 				posixFailure("Cannot create child process", {});
@@ -250,7 +254,7 @@ namespace Lemon::Update {
 			checkExec(errorRead.get(), pid);
 			return pid;
 		}
-	}
+	} // namespace
 
 	void runSystemUtility(const std::vector<std::string> &arguments, const fs::path &log) {
 		const auto pid = spawn(arguments, {}, log, false);
@@ -265,7 +269,8 @@ namespace Lemon::Update {
 			command.emplace_back("--update-error");
 			command.push_back(pathText(arguments.work / "error.log"));
 		}
-		const auto pid = spawn(command, arguments.executable.parent_path(), arguments.work / "restart.log", true);
+		const auto pid =
+		    spawn(command, arguments.executable.parent_path(), arguments.work / "restart.log", true);
 		const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
 		while (std::chrono::steady_clock::now() < deadline) {
 			if (waitChild(pid, WNOHANG) != -1)
@@ -274,6 +279,6 @@ namespace Lemon::Update {
 		}
 	}
 
-}
+} // namespace Lemon::Update
 
 #endif

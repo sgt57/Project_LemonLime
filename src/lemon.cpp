@@ -634,7 +634,8 @@ bool LemonLime::saveContest(const QString &fileName) {
 	const bool saved = file.write(data) == data.size() && file.commit();
 	QApplication::restoreOverrideCursor();
 	if (! saved) {
-		QMessageBox::warning(this, tr("Error"), tr("Cannot save file %1: %2").arg(fileName, file.errorString()));
+		QMessageBox::warning(this, tr("Error"),
+		                     tr("Cannot save file %1: %2").arg(fileName, file.errorString()));
 		ui->statusBar->showMessage(tr("Save Failed"), 1000);
 		return false;
 	}

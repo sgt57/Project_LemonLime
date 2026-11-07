@@ -54,7 +54,8 @@ namespace Lemon::Update {
 		requireSafeParents(arguments.work);
 		requireRealDirectory(arguments.installation);
 		requireSafeParents(arguments.installation);
-		if (isWithin(arguments.work, arguments.installation) || isWithin(arguments.installation, arguments.work))
+		if (isWithin(arguments.work, arguments.installation) ||
+		    isWithin(arguments.installation, arguments.work))
 			fail("The update work directory must be separate from the installation.");
 		if (! isWithin(arguments.executable, arguments.installation) ||
 		    arguments.executable == arguments.installation)
@@ -64,8 +65,8 @@ namespace Lemon::Update {
 	}
 
 	static void validateStagedExecutable(const Arguments &arguments) {
-		const auto executable = arguments.work / "payload" /
-		                        arguments.executable.lexically_relative(arguments.installation);
+		const auto executable =
+		    arguments.work / "payload" / arguments.executable.lexically_relative(arguments.installation);
 		requireSafeParents(executable.parent_path());
 		requireRegularFile(executable);
 		if (fs::file_size(executable) == 0)
@@ -186,4 +187,4 @@ namespace Lemon::Update {
 		}
 	}
 
-}
+} // namespace Lemon::Update
