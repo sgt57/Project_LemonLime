@@ -20,6 +20,7 @@ namespace Ui {
 class Contest;
 class Settings;
 class OptionsDialog;
+class UpdateChecker;
 
 class LemonLime : public QMainWindow {
 	Q_OBJECT
@@ -37,6 +38,8 @@ class LemonLime : public QMainWindow {
 	Contest *curContest;
 	Settings *settings;
 	QFileSystemWatcher *dataDirWatcher;
+	UpdateChecker *updateChecker;
+	bool closingForUpdate = false;
 	QString curFile;
 	QSignalMapper *signalMapper;
 	QMenu *TaskMenu;
@@ -46,7 +49,7 @@ class LemonLime : public QMainWindow {
 	void loadUiLanguage();
 	void insertWatchPath(const QString &, QFileSystemWatcher *);
 	void newContest(const QString &, const QString &, const QString &);
-	void saveContest(const QString &);
+	bool saveContest(const QString &);
 	void loadContest(const QString &);
 	static void getFiles(const QString &, const QStringList &, QMap<QString, QString> &);
 	void addTask(const QString &, const QList<std::pair<QString, QString>> &, int, int, int);

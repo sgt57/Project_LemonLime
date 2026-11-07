@@ -127,6 +127,8 @@ auto Settings::getMaxJudgingThreads() const -> int { return maxJudgingThreads; }
 
 bool Settings::getPreventSleepWhileJudging() const { return preventSleepWhileJudging; }
 
+bool Settings::getCheckUpdatesOnStartup() const { return checkUpdatesOnStartup; }
+
 auto Settings::getDefaultExtraTimeRatio() const -> double { return defaultExtraTimeRatio; }
 
 auto Settings::getDefaultInputFileExtension() const -> const QString & { return defaultInputFileExtension; }
@@ -198,6 +200,8 @@ void Settings::setMaxJudgingThreads(int number) {
 }
 
 void Settings::setPreventSleepWhileJudging(bool enabled) { preventSleepWhileJudging = enabled; }
+
+void Settings::setCheckUpdatesOnStartup(bool enabled) { checkUpdatesOnStartup = enabled; }
 
 void Settings::setColorScheme(Qt::ColorScheme scheme) {
 	switch (scheme) {
@@ -398,6 +402,7 @@ void Settings::copyFrom(Settings *other) {
 	setRejudgeTimes(other->getRejudgeTimes());
 	setMaxJudgingThreads(other->getMaxJudgingThreads());
 	setPreventSleepWhileJudging(other->getPreventSleepWhileJudging());
+	setCheckUpdatesOnStartup(other->getCheckUpdatesOnStartup());
 	setDefaultInputFileExtension(other->getDefaultInputFileExtension());
 	setDefaultOutputFileExtension(other->getDefaultOutputFileExtension());
 	setInputFileExtensions(other->getInputFileExtensions().join(";"));
@@ -449,6 +454,7 @@ void Settings::saveSettings() {
 	settings.setValue("MaximumRejudgeTimes", rejudgeTimes);
 	settings.setValue("MaximumJudgingThreads", maxJudgingThreads);
 	settings.setValue("PreventSleepWhileJudging", preventSleepWhileJudging);
+	settings.setValue("CheckUpdatesOnStartup", checkUpdatesOnStartup);
 	settings.setValue("DefaultInputFileExtension", defaultInputFileExtension);
 	settings.setValue("DefaultOutputFileExtension", defaultOutputFileExtension);
 	settings.setValue("InputFileExtensions", inputFileExtensions);
@@ -566,6 +572,7 @@ void Settings::loadSettings() {
 	DEBUG("Loaded maximum judging threads:", maxJudgingThreads,
 	      "source:", settings.contains("MaximumJudgingThreads") ? "saved setting" : "CPU topology default");
 	preventSleepWhileJudging = settings.value("PreventSleepWhileJudging", true).toBool();
+	checkUpdatesOnStartup = settings.value("CheckUpdatesOnStartup", true).toBool();
 	defaultInputFileExtension = settings.value("DefaultInputFileExtension", "in").toString();
 	defaultOutputFileExtension = settings.value("DefaultOutputFileExtension", "out").toString();
 	inputFileExtensions = settings.value("InputFileExtensions", QStringList() << "in").toStringList();

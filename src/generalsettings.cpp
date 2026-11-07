@@ -65,6 +65,8 @@ GeneralSettings::GeneralSettings(QWidget *parent) : QWidget(parent), ui(new Ui::
 	        &GeneralSettings::onLanguageComboBoxChanged);
 	connect(ui->preventSleepWhileJudging, &QCheckBox::toggled, this,
 	        [this](bool checked) { editSettings->setPreventSleepWhileJudging(checked); });
+	connect(ui->checkUpdatesOnStartup, &QCheckBox::toggled, this,
+	        [this](bool checked) { editSettings->setCheckUpdatesOnStartup(checked); });
 }
 
 GeneralSettings::~GeneralSettings() { delete ui; }
@@ -84,6 +86,7 @@ void GeneralSettings::resetEditSettings(Settings *settings) {
 	ui->outputFileExtensions->setText(editSettings->getOutputFileExtensions().join(";"));
 	ui->languageComboBox->setCurrentText(editSettings->getUiLanguage());
 	ui->preventSleepWhileJudging->setChecked(editSettings->getPreventSleepWhileJudging());
+	ui->checkUpdatesOnStartup->setChecked(editSettings->getCheckUpdatesOnStartup());
 }
 
 void GeneralSettings::onLanguageComboBoxChanged(const QString &arg) { editSettings->setUiLanguage(arg); }

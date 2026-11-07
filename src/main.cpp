@@ -8,6 +8,7 @@
  */
 
 #include "lemon.h"
+#include "updateinstaller.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 //
 #include "base/LemonBase.hpp"
@@ -16,6 +17,8 @@
 #include "spdlog/sinks/daily_file_sink.h"
 //
 #include <QApplication>
+#include <QFile>
+#include <QMessageBox>
 #include <QPixmap>
 #include <QSplashScreen>
 #include <chrono>
@@ -47,6 +50,21 @@ int main(int argc, char *argv[]) {
 
 	app.Initialize();
 
+	const QStringList arguments = app.arguments();
+#ifdef Q_OS_WIN
+	UpdateInstaller::cleanupPreviousUpdate(arguments);
+#endif
+	const qsizetype updateError = arguments.indexOf("--update-error");
+	if (updateError >= 0 && updateError + 1 < arguments.size()) {
+		QFile file(arguments.at(updateError + 1));
+		if (file.open(QIODevice::ReadOnly)) {
+			QMessageBox message(QMessageBox::Warning,
+			                    QCoreApplication::translate("UpdateChecker", "Update Failed"),
+			                    QString::fromUtf8(file.read(64LL * 1024)), QMessageBox::Ok);
+			message.setTextFormat(Qt::PlainText);
+			message.exec();
+		}
+	}
 	if (app.sendMessage("")) {
 		app.activeWindow();
 		return 0;

@@ -86,6 +86,7 @@ class Settings {
 	int getRejudgeTimes() const;
 	int getMaxJudgingThreads() const;
 	bool getPreventSleepWhileJudging() const;
+	bool getCheckUpdatesOnStartup() const;
 	double getDefaultExtraTimeRatio() const;
 	const QString &getDefaultInputFileExtension() const;
 	const QString &getDefaultOutputFileExtension() const;
@@ -109,6 +110,7 @@ class Settings {
 	void setRejudgeTimes(int);
 	void setMaxJudgingThreads(int);
 	void setPreventSleepWhileJudging(bool);
+	void setCheckUpdatesOnStartup(bool);
 	void setDefaultInputFileExtension(const QString &);
 	void setDefaultOutputFileExtension(const QString &);
 	void setInputFileExtensions(const QString &);
@@ -159,6 +161,7 @@ class Settings {
 	int rejudgeTimes{};
 	int maxJudgingThreads{};
 	bool preventSleepWhileJudging = true;
+	bool checkUpdatesOnStartup = true;
 	double defaultExtraTimeRatio{};
 	QString defaultInputFileExtension;
 	QString defaultOutputFileExtension;

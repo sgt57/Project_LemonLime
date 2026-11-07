@@ -1073,6 +1073,10 @@ Depends: </source>
         <translation>Prevent system sleep while judging</translation>
     </message>
     <message>
+        <source>Check for updates on startup</source>
+        <translation>Check for updates on startup</translation>
+    </message>
+    <message>
         <source>Form</source>
         <translation></translation>
     </message>
@@ -1407,6 +1411,10 @@ Depends: </source>
 <context>
     <name>LemonLime</name>
     <message>
+        <source>Cannot save file %1: %2</source>
+        <translation>Cannot save file %1: %2</translation>
+    </message>
+    <message>
         <source>LemonLime</source>
         <translation></translation>
     </message>
@@ -1561,6 +1569,10 @@ Depends: </source>
     <message>
         <source>LemonLime Settings...</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Check for Updates</source>
+        <translation>Check for Updates</translation>
     </message>
     <message>
         <source>&amp;About</source>
@@ -2805,6 +2817,134 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Judging submissions</source>
         <translation>Judging submissions</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateChecker</name>
+    <message>
+        <source>Invalid release version.</source>
+        <translation>Invalid release version.</translation>
+    </message>
+    <message>
+        <source>Invalid release checksum.</source>
+        <translation>Invalid release checksum.</translation>
+    </message>
+    <message>
+        <source>Checking for updates...</source>
+        <translation>Checking for updates...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>Check for Updates</source>
+        <translation>Check for Updates</translation>
+    </message>
+    <message>
+        <source>No new version is available.</source>
+        <translation>No new version is available.</translation>
+    </message>
+    <message>
+        <source>Cannot check for updates: %1</source>
+        <translation>Cannot check for updates: %1</translation>
+    </message>
+    <message>
+        <source>Invalid response from GitHub.</source>
+        <translation>Invalid response from GitHub.</translation>
+    </message>
+    <message>
+        <source>Update Available</source>
+        <translation>Update Available</translation>
+    </message>
+    <message>
+        <source>Current version: %1
+New version: %2</source>
+        <translation>Current version: %1
+New version: %2</translation>
+    </message>
+    <message>
+        <source>No release notes provided.</source>
+        <translation>No release notes provided.</translation>
+    </message>
+    <message>
+        <source>This release has no update package for this system or architecture.</source>
+        <translation>This release has no update package for this system or architecture.</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Update</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>Ignore</translation>
+    </message>
+    <message>
+        <source>Don't notify again</source>
+        <translation>Don't notify again</translation>
+    </message>
+    <message>
+        <source>Cannot create the update directory.</source>
+        <translation>Cannot create the update directory.</translation>
+    </message>
+    <message>
+        <source>Downloading %1...</source>
+        <translation>Downloading %1...</translation>
+    </message>
+    <message>
+        <source>Update LemonLime</source>
+        <translation>Update LemonLime</translation>
+    </message>
+    <message>
+        <source>The downloaded package has an unexpected size.</source>
+        <translation>The downloaded package has an unexpected size.</translation>
+    </message>
+    <message>
+        <source>Download failed: %1</source>
+        <translation>Download failed: %1</translation>
+    </message>
+    <message>
+        <source>The downloaded package is incomplete or its checksum does not match.</source>
+        <translation>The downloaded package is incomplete or its checksum does not match.</translation>
+    </message>
+    <message>
+        <source>Preparing the update...</source>
+        <translation>Preparing the update...</translation>
+    </message>
+    <message>
+        <source>Update Failed</source>
+        <translation>Update Failed</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateInstaller</name>
+    <message>
+        <source>An update installation is already in progress.</source>
+        <translation>An update installation is already in progress.</translation>
+    </message>
+    <message>
+        <source>Cannot create the independent update helper.</source>
+        <translation>Cannot create the independent update helper.</translation>
+    </message>
+    <message>
+        <source>The update preparation tool timed out.</source>
+        <translation>The update preparation tool timed out.</translation>
+    </message>
+    <message>
+        <source>Update preparation failed: %1</source>
+        <translation>Update preparation failed: %1</translation>
+    </message>
+    <message>
+        <source>No prepared update is available.</source>
+        <translation>No prepared update is available.</translation>
+    </message>
+    <message>
+        <source>Cannot start the independent update helper: %1</source>
+        <translation>Cannot start the independent update helper: %1</translation>
+    </message>
+    <message>
+        <source>The update helper did not become ready. %1</source>
+        <translation>The update helper did not become ready. %1</translation>
     </message>
 </context>
 </TS>

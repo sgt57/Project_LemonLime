@@ -1094,6 +1094,10 @@ Depends: </source>
         <translation>评测时阻止系统休眠</translation>
     </message>
     <message>
+        <source>Check for updates on startup</source>
+        <translation>启动时检查更新</translation>
+    </message>
+    <message>
         <source>Form</source>
         <translation>Form</translation>
     </message>
@@ -1432,6 +1436,10 @@ Depends: </source>
 <context>
     <name>LemonLime</name>
     <message>
+        <source>Cannot save file %1: %2</source>
+        <translation>无法保存文件 %1：%2</translation>
+    </message>
+    <message>
         <source>LemonLime</source>
         <translation>LemonLime</translation>
     </message>
@@ -1586,6 +1594,10 @@ Depends: </source>
     <message>
         <source>LemonLime Settings...</source>
         <translation>LemonLime 设置…</translation>
+    </message>
+    <message>
+        <source>Check for Updates</source>
+        <translation>检查更新</translation>
     </message>
     <message>
         <source>&amp;About</source>
@@ -2839,6 +2851,103 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Judging submissions</source>
         <translation>正在评测提交程序</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateChecker</name>
+    <message>
+        <source>Invalid release version.</source>
+        <translation>发布版本号无效。</translation>
+    </message>
+    <message>
+        <source>Invalid release checksum.</source>
+        <translation>发布包校验值无效。</translation>
+    </message>
+    <message>
+        <source>Checking for updates...</source>
+        <translation>正在检查更新…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Check for Updates</source>
+        <translation>检查更新</translation>
+    </message>
+    <message>
+        <source>No new version is available.</source>
+        <translation>没有新版本。</translation>
+    </message>
+    <message>
+        <source>Cannot check for updates: %1</source>
+        <translation>无法检查更新：%1</translation>
+    </message>
+    <message>
+        <source>Invalid response from GitHub.</source>
+        <translation>GitHub 返回的数据无效。</translation>
+    </message>
+    <message>
+        <source>Update Available</source>
+        <translation>有可用更新</translation>
+    </message>
+    <message>
+        <source>Current version: %1
+New version: %2</source>
+        <translation>当前版本：%1
+新版本：%2</translation>
+    </message>
+    <message>
+        <source>No release notes provided.</source>
+        <translation>此版本没有提供更新日志。</translation>
+    </message>
+    <message>
+        <source>This release has no update package for this system or architecture.</source>
+        <translation>此版本没有适用于当前系统或架构的更新包。</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>更新</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>忽略</translation>
+    </message>
+    <message>
+        <source>Don't notify again</source>
+        <translation>不再提示</translation>
+    </message>
+    <message>
+        <source>Cannot create the update directory.</source>
+        <translation>无法创建更新临时目录。</translation>
+    </message>
+    <message>
+        <source>Downloading %1...</source>
+        <translation>正在下载 %1…</translation>
+    </message>
+    <message>
+        <source>Update LemonLime</source>
+        <translation>更新 LemonLime</translation>
+    </message>
+    <message>
+        <source>The downloaded package has an unexpected size.</source>
+        <translation>下载的更新包大小与发布信息不符。</translation>
+    </message>
+    <message>
+        <source>Download failed: %1</source>
+        <translation>下载失败：%1</translation>
+    </message>
+    <message>
+        <source>The downloaded package is incomplete or its checksum does not match.</source>
+        <translation>更新包下载不完整或校验失败。</translation>
+    </message>
+    <message>
+        <source>Preparing the update...</source>
+        <translation>正在准备更新…</translation>
+    </message>
+    <message>
+        <source>Update Failed</source>
+        <translation>更新失败</translation>
     </message>
 </context>
 </TS>

@@ -73,6 +73,17 @@ auto LemonBaseApplication::parseCommandLine(bool *canContinue, QString *errorMes
 	parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
 	//
 	parser.addOption(debugLogOption);
+	QCommandLineOption updateErrorOption("update-error", QString(), "file");
+	updateErrorOption.setFlags(QCommandLineOption::HiddenFromHelp);
+	parser.addOption(updateErrorOption);
+#ifdef Q_OS_WIN
+	QCommandLineOption updateCleanupOption("update-cleanup", QString(), "directory");
+	updateCleanupOption.setFlags(QCommandLineOption::HiddenFromHelp);
+	parser.addOption(updateCleanupOption);
+	QCommandLineOption updateHelperOption("update-helper-pid", QString(), "pid");
+	updateHelperOption.setFlags(QCommandLineOption::HiddenFromHelp);
+	parser.addOption(updateHelperOption);
+#endif
 	//
 	const auto helpOption = parser.addHelpOption();
 	const auto versionOption = parser.addVersionOption();

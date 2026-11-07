@@ -528,6 +528,7 @@
     </widget>
     <addaction name="menuGuides"/>
     <addaction name="separator"/>
+    <addaction name="checkUpdatesAction"/>
     <addaction name="aboutAction"/>
    </widget>
    <addaction name="fileMenu"/>
@@ -582,6 +583,11 @@
    </property>
    <property name="statusTip">
     <string>LemonLime Settings...</string>
+   </property>
+  </action>
+  <action name="checkUpdatesAction">
+   <property name="text">
+    <string>Check for Updates</string>
    </property>
   </action>
   <action name="aboutAction">

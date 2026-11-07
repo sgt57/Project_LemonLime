@@ -32,10 +32,17 @@
    <property name="verticalSpacing">
     <number>10</number>
    </property>
-   <item row="10" column="2" rowspan="2" colspan="2">
+   <item row="10" column="2" colspan="2">
     <widget class="QCheckBox" name="preventSleepWhileJudging">
      <property name="text">
       <string>Prevent system sleep while judging</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="2" colspan="2">
+    <widget class="QCheckBox" name="checkUpdatesOnStartup">
+     <property name="text">
+      <string>Check for updates on startup</string>
      </property>
     </widget>
    </item>
@@ -798,6 +805,7 @@
   <tabstop>outputFileExtensions</tabstop>
   <tabstop>languageComboBox</tabstop>
   <tabstop>preventSleepWhileJudging</tabstop>
+  <tabstop>checkUpdatesOnStartup</tabstop>
  </tabstops>
  <resources/>
  <connections/>

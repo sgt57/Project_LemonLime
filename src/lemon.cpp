@@ -28,15 +28,18 @@
 #include "opencontestdialog.h"
 #include "optionsdialog.h"
 #include "statisticsbrowser.h"
+#include "updatechecker.h"
 #include "welcomedialog.h"
 //
 #include <QByteArrayView>
+#include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QSaveFile>
 #include <QStatusBar>
 #include <QStyleHints>
 #include <QTextBrowser>
@@ -57,6 +60,16 @@ LemonLime::LemonLime(QWidget *parent) : QMainWindow(parent), ui(new Ui::LemonLim
 	ui->actionChangeContestName->setEnabled(false);
 	dataDirWatcher = nullptr;
 	settings->loadSettings();
+	updateChecker = new UpdateChecker(settings, this);
+	connect(ui->checkUpdatesAction, &QAction::triggered, this, [this]() { updateChecker->check(); });
+	connect(updateChecker, &UpdateChecker::readyToRestart, this, [this]() {
+		if (curContest && ! saveContest(curFile))
+			return;
+		if (updateChecker->launchInstaller()) {
+			closingForUpdate = true;
+			close();
+		}
+	});
 	TaskMenu = new QMenu();
 	signalMapper = new QSignalMapper();
 	ui->summary->setSettings(settings);
@@ -122,9 +135,11 @@ void LemonLime::changeEvent(QEvent *event) {
 	}
 }
 
-void LemonLime::closeEvent(QCloseEvent * /*event*/) {
-	if (curContest)
-		saveContest(curFile);
+void LemonLime::closeEvent(QCloseEvent *event) {
+	if (curContest && ! closingForUpdate && ! saveContest(curFile)) {
+		event->ignore();
+		return;
+	}
 
 	settings->saveSettings();
 	QSettings settings("LemonLime", "lemon");
@@ -163,6 +178,8 @@ void LemonLime::welcome() {
 	}
 
 	delete dialog;
+	if (settings->getCheckUpdatesOnStartup())
+		QTimer::singleShot(0, updateChecker, [this]() { updateChecker->check(true); });
 }
 
 void LemonLime::insertWatchPath(const QString &curDir, QFileSystemWatcher *watcher) {
@@ -600,30 +617,29 @@ void LemonLime::contestantDeleted() {
 	ui->refreshAction->setEnabled(true);
 }
 
-void LemonLime::saveContest(const QString &fileName) {
-	QFile file(fileName);
+bool LemonLime::saveContest(const QString &fileName) {
+	QSaveFile file(fileName);
 
 	if (! file.open(QFile::WriteOnly)) {
 		QMessageBox::warning(this, tr("Error"), tr("Cannot open file %1").arg(fileName), QMessageBox::Close);
 		ui->statusBar->showMessage(tr("Save Failed"), 1000);
 		WARN(fileName, "Save Failed");
-		return;
+		return false;
 	}
 
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 	QJsonObject out;
 	curContest->writeToJson(out);
-	file.write(QJsonDocument(out).toJson(QJsonDocument::Compact));
-	/* QByteArray data;
-	QDataStream _out(&data, QIODevice::WriteOnly);
-	curContest->writeToStream(_out);
-	data = qCompress(data);
-	QDataStream out(&file);
-	out << unsigned(MagicNumber) << qChecksum(QByteArrayView(data))
-	    << static_cast<int>(data.length()); // Qt 6+ uses qsizetype for length
-	out.writeRawData(data.data(), data.length()); */
+	const QByteArray data = QJsonDocument(out).toJson(QJsonDocument::Compact);
+	const bool saved = file.write(data) == data.size() && file.commit();
 	QApplication::restoreOverrideCursor();
+	if (! saved) {
+		QMessageBox::warning(this, tr("Error"), tr("Cannot save file %1: %2").arg(fileName, file.errorString()));
+		ui->statusBar->showMessage(tr("Save Failed"), 1000);
+		return false;
+	}
 	ui->statusBar->showMessage(tr("Saved"), 1000);
+	return true;
 }
 
 void LemonLime::loadContest(const QString &filePath) {
