@@ -205,13 +205,13 @@ class IntegratedTest : public QObject {
 		    {"user1", 0, CompileSuccessfully, {CorrectAnswer}},
 		    {"user2", 0, NoValidSourceFile, {}},
 		    {"user1",
-			 1,
-			 CompileSuccessfully,
-			 {CorrectAnswer, TimeLimitExceeded, MemoryLimitExceeded, WrongAnswer, RunTimeError, WrongAnswer}},
+		     1,
+		     CompileSuccessfully,
+		     {CorrectAnswer, TimeLimitExceeded, MemoryLimitExceeded, WrongAnswer, RunTimeError, WrongAnswer}},
 		    {"user2",
-			 1,
-			 CompileSuccessfully,
-			 {CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer}},
+		     1,
+		     CompileSuccessfully,
+		     {CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer}},
 		};
 		for (const Expected &row : expected) {
 			const Contestant *contestant = contest.getContestant(row.contestant);
@@ -222,7 +222,7 @@ class IntegratedTest : public QObject {
 				                            .arg(row.contestant)
 				                            .arg(row.task)
 				                            .arg(cppPath, cpp.getCompilerArguments().value(0),
-											     contestant->getCompileMessage(row.task));
+				                                 contestant->getCompileMessage(row.task));
 			QCOMPARE(contestant->getCompileState(row.task), row.compilation);
 			const auto &results = contestant->getResult(row.task);
 			QCOMPARE(results.size(), row.verdicts.size());
