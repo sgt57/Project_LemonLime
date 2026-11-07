@@ -170,7 +170,9 @@ ProcessRunnerResult UnixProcessRunner::run() {
 	if (! runner.waitForStarted(-1)) {
 		res.score = 0;
 		res.result = CannotStartProgram;
-		res.message = "Start runner failed";
+		res.message = QString("Start runner failed: %1\n%2")
+		                  .arg(runner.errorString(), QString::fromLocal8Bit(runner.readAllStandardError()));
+		WARN(config.executableFile, res.message);
 		return res;
 	}
 
@@ -196,6 +198,8 @@ ProcessRunnerResult UnixProcessRunner::run() {
 	}
 
 	if (! isProgramFinishedInExtraTimeLimit) {
+		WARN(config.executableFile, "Watcher exceeded its wall-clock deadline after", timer.elapsed(),
+		     "ms; terminating watcher pid", runner.processId());
 		runner.terminate();
 		runner.waitForFinished(-1);
 		res.score = 0;
@@ -203,7 +207,14 @@ ProcessRunnerResult UnixProcessRunner::run() {
 		// Watcher usually needs to handle the situation of program timeout and kill it. Therefore, it is
 		// abnormal for watcher to timeout itself, and report FAIL instead of TLE.
 		res.result = CannotStartProgram;
-		res.message = "Watcher time limit exceeded";
+		res.message = QString("Watcher time limit exceeded after %1 ms; exit status %2, exit code %3, "
+		                      "process error %4: %5\n%6")
+		                  .arg(timer.elapsed())
+		                  .arg(int(runner.exitStatus()))
+		                  .arg(runner.exitCode())
+		                  .arg(int(runner.error()))
+		                  .arg(runner.errorString(), QString::fromLocal8Bit(runner.readAllStandardError()));
+		WARN(config.executableFile, res.message);
 		return res;
 	}
 
@@ -252,8 +263,16 @@ ProcessRunnerResult UnixProcessRunner::run() {
 		default:
 			res.result = CannotStartProgram;
 			res.score = 0;
-			res.message = QString("Watcher reported an invalid result: %1").arg(code);
+			res.message = QString("Watcher reported an invalid result: %1\n%2").arg(code).arg(res.message);
 			break;
+	}
+	if (res.result == CannotStartProgram || runner.exitStatus() == QProcess::CrashExit) {
+		res.message = QString("Watcher failure: exit status %1, exit code %2, process error %3: %4\n%5")
+		                  .arg(int(runner.exitStatus()))
+		                  .arg(code)
+		                  .arg(int(runner.error()))
+		                  .arg(runner.errorString(), res.message);
+		WARN(config.executableFile, res.message);
 	}
 
 	return res;

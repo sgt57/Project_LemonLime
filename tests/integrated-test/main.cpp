@@ -205,13 +205,13 @@ class IntegratedTest : public QObject {
 		    {"user1", 0, CompileSuccessfully, {CorrectAnswer}},
 		    {"user2", 0, NoValidSourceFile, {}},
 		    {"user1",
-		     1,
-		     CompileSuccessfully,
-		     {CorrectAnswer, TimeLimitExceeded, MemoryLimitExceeded, WrongAnswer, RunTimeError, WrongAnswer}},
+			 1,
+			 CompileSuccessfully,
+			 {CorrectAnswer, TimeLimitExceeded, MemoryLimitExceeded, WrongAnswer, RunTimeError, WrongAnswer}},
 		    {"user2",
-		     1,
-		     CompileSuccessfully,
-		     {CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer}},
+			 1,
+			 CompileSuccessfully,
+			 {CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer, CorrectAnswer}},
 		};
 		for (const Expected &row : expected) {
 			const Contestant *contestant = contest.getContestant(row.contestant);
@@ -227,12 +227,13 @@ class IntegratedTest : public QObject {
 				// Allocation failures may be reported as MLE or RE depending on the platform.
 				const bool allocationFailure = wanted == MemoryLimitExceeded && actual == RunTimeError;
 				QVERIFY2(actual == wanted || allocationFailure,
-				         qPrintable(QString("%1 task %2 case %3: expected %4, got %5")
+				         qPrintable(QString("%1 task %2 case %3: expected %4, got %5\n%6")
 				                        .arg(row.contestant)
 				                        .arg(row.task)
 				                        .arg(i)
 				                        .arg(wanted)
-				                        .arg(actual)));
+				                        .arg(actual)
+				                        .arg(contestant->getMessage(row.task).value(i).value(0))));
 			}
 		}
 	}
