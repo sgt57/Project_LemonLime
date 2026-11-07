@@ -1,0 +1,120 @@
+name: POSIX failure probes
+on:
+  push:
+    branches: [diag/posix-tests]
+    paths: [.github/workflows/posix-failure-probes.yml]
+  workflow_dispatch:
+jobs:
+  macos-compiler:
+    runs-on: macos-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.12.0'
+          cache: true
+      - name: Probe compiler execution and process stacks
+        run: |
+          mkdir -p diagnostics
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import signal
+          import subprocess
+          import time
+
+          root = Path.cwd()
+          logs = root / 'diagnostics'
+          source = root / 'tests/data/TestContest1/source/user1/helloworld.cpp'
+
+          def probe(name, command, timeout=18):
+              print(f'::group::{name}: {command}', flush=True)
+              start = time.monotonic()
+              with (logs / (name + '.txt')).open('w') as output:
+                  p = subprocess.Popen(command, stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+                  try:
+                      p.wait(timeout=3)
+                  except subprocess.TimeoutExpired:
+                      tree = subprocess.run(['/bin/ps', '-axo', 'pid=,ppid=,arch=,etime=,time=,command='], capture_output=True, text=True, timeout=3).stdout
+                      (logs / (name + '-processes.txt')).write_text(tree)
+                      descendants = {p.pid}
+                      rows = [row.split(None, 2) for row in tree.splitlines()]
+                      for _ in range(5):
+                          descendants.update(int(row[0]) for row in rows if len(row) == 3 and int(row[1]) in descendants)
+                      for pid in sorted(descendants)[:4]:
+                          try:
+                              subprocess.run(['/usr/bin/sample', str(pid), '1', '-file', str(logs / f'{name}-{pid}.sample.txt')], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
+                          except subprocess.TimeoutExpired:
+                              print(f'sample timed out for pid {pid}', flush=True)
+                      try:
+                          p.wait(timeout=max(0.1, timeout - (time.monotonic() - start)))
+                      except subprocess.TimeoutExpired:
+                          os.killpg(p.pid, signal.SIGKILL)
+                          p.wait(timeout=2)
+                          output.write('\nPROBE DEADLINE EXCEEDED\n')
+                  output.write(f'\nexit={p.returncode}; elapsed={time.monotonic()-start:.3f}s\n')
+              print((logs / (name + '.txt')).read_text(), flush=True)
+              print('::endgroup::', flush=True)
+
+          probe('compiler-path', ['/usr/bin/xcrun', '--find', 'clang++'])
+          for arch in ['arm64', 'x86_64']:
+              probe(arch + '-version', ['/usr/bin/arch', '-' + arch, '/usr/bin/g++', '--version'])
+              probe(arch + '-compile', ['/usr/bin/arch', '-' + arch, '/usr/bin/g++', str(source), '-o', str(logs / ('hello-' + arch)), '-O2', '-lm'])
+              probe(arch + '-driver', ['/usr/bin/arch', '-' + arch, '/usr/bin/g++', '-###', str(source), '-o', str(logs / ('hello-' + arch)), '-O2', '-lm'])
+
+          harness = logs / 'qprocess-probe.cpp'
+          harness.write_text(r'''
+          #include <QCoreApplication>
+          #include <QElapsedTimer>
+          #include <QProcess>
+          #include <QThread>
+          #include <cstdio>
+          #include <cstdlib>
+          int main(int argc, char **argv) {
+              QCoreApplication app(argc, argv);
+              const QString source = app.arguments().at(1);
+              const QString output = app.arguments().at(2);
+              auto *worker = QThread::create([&] {
+                  QElapsedTimer elapsed;
+                  elapsed.start();
+                  QProcess compiler;
+                  compiler.start("/usr/bin/g++", {source, "-o", output, "-O2", "-lm"});
+                  if (!compiler.waitForStarted(5000)) {
+                      fprintf(stderr, "START FAILURE: %s\n", qPrintable(compiler.errorString()));
+                      return;
+                  }
+                  fprintf(stderr, "COMPILER PID: %lld\n", compiler.processId());
+                  fflush(stderr);
+                  bool finished = false;
+                  while (elapsed.elapsed() < 20000) {
+                      if (compiler.waitForFinished(10)) { finished = true; break; }
+                  }
+                  fprintf(stderr, "finished=%d elapsed=%lld status=%d exit=%d error=%d %s\n%s\n%s\n",
+                          finished, elapsed.elapsed(), int(compiler.exitStatus()), compiler.exitCode(),
+                          int(compiler.error()), qPrintable(compiler.errorString()),
+                          compiler.readAllStandardOutput().constData(), compiler.readAllStandardError().constData());
+                  fflush(stderr);
+                  if (!finished) { compiler.kill(); compiler.waitForFinished(1000); }
+              });
+              worker->start();
+              if (!worker->wait(24000)) std::_Exit(2);
+              delete worker;
+              return 0;
+          }
+          ''')
+          for arch in ['arm64', 'x86_64']:
+              directory = logs / ('qt-' + arch)
+              directory.mkdir()
+              project = directory / 'probe.pro'
+              project.write_text('QT = core\nCONFIG += console c++17\nCONFIG -= app_bundle\nTARGET = qprocess-probe\nSOURCES = ../qprocess-probe.cpp\nQMAKE_APPLE_DEVICE_ARCHS = ' + arch + '\n')
+              subprocess.run(['qmake', str(project)], cwd=directory, check=True, timeout=15)
+              subprocess.run(['make', '-j2'], cwd=directory, check=True, timeout=30)
+              probe(arch + '-qprocess-compile', [str(directory / 'qprocess-probe'), str(source), str(directory / 'hello')], timeout=25)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: macos-compiler-probes
+          path: |
+            diagnostics/*.txt
