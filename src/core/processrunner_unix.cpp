@@ -173,7 +173,7 @@ ProcessRunnerResult UnixProcessRunner::run() {
 
 #endif
 
-	if (! runner.waitForStarted(-1)) {
+	if (! runner.waitForStarted(30000)) {
 		res.score = 0;
 		res.result = CannotStartProgram;
 		res.message = QString("Start runner failed: %1\n%2")
@@ -181,6 +181,17 @@ ProcessRunnerResult UnixProcessRunner::run() {
 		WARN(config.executableFile, res.message);
 		return res;
 	}
+	const auto stopRunner = [&] {
+		if (runner.state() == QProcess::NotRunning)
+			return;
+		runner.terminate();
+		if (runner.waitForFinished(1000) || runner.state() == QProcess::NotRunning)
+			return;
+		WARN(config.executableFile, "Watcher ignored termination; forcing exit of pid", runner.processId());
+		runner.kill();
+		if (! runner.waitForFinished(1000) && runner.state() != QProcess::NotRunning)
+			WARN(config.executableFile, "Cannot reap watcher after forced termination", runner.errorString());
+	};
 
 	bool isProgramFinishedInExtraTimeLimit = false;
 	QElapsedTimer timer;
@@ -196,8 +207,7 @@ ProcessRunnerResult UnixProcessRunner::run() {
 		}
 
 		if (cancellation.isCanceled()) {
-			runner.terminate();
-			runner.waitForFinished(-1);
+			stopRunner();
 
 			return res;
 		}
@@ -206,8 +216,7 @@ ProcessRunnerResult UnixProcessRunner::run() {
 	if (! isProgramFinishedInExtraTimeLimit) {
 		WARN(config.executableFile, "Watcher exceeded its wall-clock deadline after", timer.elapsed(),
 		     "ms; terminating watcher pid", runner.processId());
-		runner.terminate();
-		runner.waitForFinished(-1);
+		stopRunner();
 		res.score = 0;
 		res.timeUsed = res.memoryUsed = -1;
 		// Watcher usually needs to handle the situation of program timeout and kill it. Therefore, it is
